@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { generateResponse } from '../../services/aiService.js'
+import {
+  generateResponse,
+  parseScheduleRequest,
+  buildScheduleConfirmation,
+} from '../../services/aiService.js'
 import './ChatPanel.css'
 
-/**
- * The "Ask AI" chat bar. This is a foundation only: it sends the
- * message to aiService (currently mocked) and shows the reply.
- * Real natural-language schedule editing comes in a later step.
- */
 function ChatPanel() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState([])
@@ -14,17 +13,57 @@ function ChatPanel() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+
     const text = input.trim()
+
     if (!text) return
 
-    setMessages((prev) => [...prev, { role: 'user', text }])
+    const userMessage = {
+      id: `msg-${Date.now()}-u`,
+      role: 'user',
+      content: text,
+    }
+
+    setMessages((prev) => [...prev, userMessage])
     setInput('')
     setIsThinking(true)
 
-    const reply = await generateResponse(text)
+    try {
+      const parsedSchedule = await parseScheduleRequest(text)
 
-    setMessages((prev) => [...prev, { role: 'ai', text: reply }])
-    setIsThinking(false)
+      let replyText
+
+      if (
+        parsedSchedule.fixedEvents.length > 0 ||
+        parsedSchedule.tasks.length > 0 ||
+        parsedSchedule.sleep
+      ) {
+        replyText = buildScheduleConfirmation(parsedSchedule)
+      } else {
+        replyText = await generateResponse(text)
+      }
+
+      const assistantMessage = {
+        id: `msg-${Date.now()}-a`,
+        role: 'assistant',
+        content: replyText,
+      }
+
+      setMessages((prev) => [...prev, assistantMessage])
+    } catch (error) {
+      console.error('AI parsing error:', error)
+
+      const errorMessage = {
+        id: `msg-${Date.now()}-error`,
+        role: 'assistant',
+        content:
+          "Sorry, I couldn't understand that schedule request. Please try describing your tasks, durations, or fixed commitments.",
+      }
+
+      setMessages((prev) => [...prev, errorMessage])
+    } finally {
+      setIsThinking(false)
+    }
   }
 
   return (
@@ -32,19 +71,41 @@ function ChatPanel() {
       <div className="chat-panel__log" aria-live="polite">
         {messages.length === 0 && !isThinking && (
           <p className="chat-panel__empty">
-            Try: "I finished DSA early" or "Skip exercise today."
+            Try: "I have college from 9 AM to 4 PM, need 2 hours
+            of DSA."
           </p>
         )}
-        {messages.map((m, i) => (
-          <p key={i} className={`chat-panel__msg chat-panel__msg--${m.role}`}>
-            {m.text}
+
+        {messages.map((message) => (
+          <p
+            key={message.id}
+            className={`chat-panel__msg chat-panel__msg--${
+              message.role === 'assistant' ? 'ai' : 'user'
+            }`}
+            style={{ whiteSpace: 'pre-line' }}
+          >
+            {message.content}
           </p>
         ))}
-        {isThinking && <p className="chat-panel__msg chat-panel__msg--ai">Thinking…</p>}
+
+        {isThinking && (
+          <p className="chat-panel__msg chat-panel__msg--ai">
+            Thinking…
+          </p>
+        )}
       </div>
 
-      <form className="chat-panel__form" onSubmit={handleSubmit}>
-        <span className="chat-panel__icon" aria-hidden="true">✦</span>
+      <form
+        className="chat-panel__form"
+        onSubmit={handleSubmit}
+      >
+        <span
+          className="chat-panel__icon"
+          aria-hidden="true"
+        >
+          ✦
+        </span>
+
         <input
           type="text"
           value={input}
@@ -52,7 +113,11 @@ function ChatPanel() {
           placeholder="Ask AI to adjust your schedule…"
           aria-label="Message to AI"
         />
-        <button type="submit" aria-label="Send message">
+
+        <button
+          type="submit"
+          aria-label="Send message"
+        >
           Send
         </button>
       </form>
