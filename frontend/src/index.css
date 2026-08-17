@@ -1,0 +1,81 @@
+/* ==========================================================
+   TIMETABLE OS — DESIGN TOKENS
+   Think "instrument panel", not "calendar app".
+   Every color/spacing/font choice below is used consistently
+   across every component via these CSS variables.
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* --- Color: cool graphite panel with a warm amber "live" accent
+     and a cyan "next" accent — like cockpit instrumentation. --- */
+  --bg: #0b0e14;
+  --panel: #131826;
+  --panel-border: #1f2633;
+  --panel-raised: #171d2b;
+
+  --accent-live: #e8a14d;      /* current task / active glow */
+  --accent-live-dim: #4a3620;
+  --accent-next: #56c2d6;      /* upcoming / progress ring */
+  --accent-danger: #e1594f;    /* skip / overdue */
+  --accent-done: #4caf7d;      /* completed checkmark */
+
+  --text-primary: #edeff4;
+  --text-muted: #8891a3;
+  --text-faint: #4b5563;
+
+  /* --- Type: monospace for numbers (reads like a real clock),
+     Inter for everything else. --- */
+  --font-display: 'JetBrains Mono', 'Courier New', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  /* Faint radial glow behind everything, like a panel backlight. */
+  background:
+    radial-gradient(circle at 50% 0%, rgba(232, 161, 77, 0.05), transparent 55%),
+    var(--bg);
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-next);
+  outline-offset: 2px;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+/* Respect users who don't want motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
