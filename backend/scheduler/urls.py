@@ -20,6 +20,15 @@ router.register(
 
 
 urlpatterns = [
-    path("health/", views.health_check, name="health_check"),
+    path(
+        "health/",
+        views.health_check,
+        name="health_check",
+    ),
+    path(
+        "register/",
+        views.register,
+        name="register",
+    ),
     path("", include(router.urls)),
 ]
