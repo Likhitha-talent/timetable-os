@@ -1,0 +1,62 @@
+.task-controls {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.task-controls__btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.task-controls__btn:hover {
+  transform: translateY(-1px);
+}
+
+.task-controls__btn--ghost {
+  background: var(--panel-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--panel-border);
+}
+
+.task-controls__btn--done {
+  background: var(--accent-live);
+  color: #1a1206;
+}
+
+.task-controls__confirm {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  width: 280px;
+  background: var(--panel-raised);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.task-controls__confirm p {
+  font-size: 14px;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.task-controls__confirm-note {
+  font-size: 13px !important;
+  color: var(--text-muted) !important;
+}
+
+.task-controls__confirm-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
